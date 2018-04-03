@@ -55,37 +55,78 @@ public class RuleEngine {
 		}
 		
 	}
+	
 	private boolean isTotalValueSatisfied(Serializable expected, Serializable actual) {
+		if(expected == null) {
+			return true;
+		}
+		if(actual == null) {
+			return false;
+		}
 		double expectedValue = (double) expected;
 		double actualValue = (double) actual;
 		return expectedValue <= actualValue;
 	}
 	
 	private boolean isPaymentModeSame(Serializable expected, Serializable actual) {
+		if(expected == null) {
+			return true;
+		}
+		if(actual == null) {
+			return false;
+		}
 		String expectedValue = (String) expected;
 		String actualValue = (String) actual;
 		return expectedValue.equals(actualValue);
 	}
 	
 	private boolean isBankCodeSame(Serializable expected, Serializable actual) {
+		if(expected == null) {
+			return true;
+		}
+		if(actual == null) {
+			return false;
+		}
 		String expectedValue = (String) expected;
 		String actualValue = (String) actual;
 		return expectedValue.equals(actualValue);
 	}
 	
 	private boolean isBrandSame(Serializable expected, Serializable actual) {
+		if(expected == null) {
+			return true;
+		}
+		if(actual == null) {
+			return false;
+		}
 		String expectedValue = (String) expected;
 		String actualValue = (String) actual;
 		return expectedValue.equals(actualValue);
 	}
 	
 	private boolean isItemSame(Serializable expected, Serializable actual) {
+		if(expected == null) {
+			return true;
+		}
+		if(actual == null) {
+			return false;
+		}
 		String expectedValue = (String) expected;
 		String actualValue = (String) actual;
 		return expectedValue.equals(actualValue);
 	}
 	
 	public boolean checkIfOrderEligible(Map<String, Serializable> criteriaMap, Map<String, Serializable> orderValueMap) {
+		if(criteriaMap == null || criteriaMap.isEmpty()) {
+			if(orderValueMap != null && !orderValueMap.isEmpty()) {
+				return true;
+			}
+		}
+		
+		if(orderValueMap == null || orderValueMap.isEmpty()) {
+			return false;
+		}
+		
 		for(String key : criteriaMap.keySet()) {
 			try {
 				boolean criteriaPassed = (boolean) RULE_ENGINE.get(key).invoke(this, criteriaMap.get(key), orderValueMap.get(key));

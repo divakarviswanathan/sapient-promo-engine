@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.sapient.promoengine.commons.PromotionConstants;
 import com.sapient.promoengine.entity.PEOrderPromotion;
@@ -25,7 +26,7 @@ import com.sapient.promoengine.utils.ObjectConverterUtil;
 @Service
 public class PromotionEngineServiceImpl implements PromotionEngineService {
 
-	private Map<String, OrderDTO> ORDER_MAP = new HashMap<>();
+	public Map<String, OrderDTO> ORDER_MAP = new HashMap<>();
 	private Map<String, IOffer> OFFERS_MAP = new HashMap<>();
 	
 	@Autowired
@@ -51,11 +52,19 @@ public class PromotionEngineServiceImpl implements PromotionEngineService {
 	
 	@Override
 	public PromotionDTO applyPromotion(OrderDTO orderDTO) {
+		if(orderDTO == null || StringUtils.isEmpty(orderDTO.getOrderId())) {
+			return null;
+		}
+		
 		//TODO: Ideally the order value has to come from an external service
 		//To keep the scope less of promotion engine. The value is pre-populated here.
 		OrderDTO order = ORDER_MAP.get(orderDTO.getOrderId());
 		
 		List<PEPromotion> applicablePromotions = pePromotionService.getApplicablePromotionsForOrder(order);
+		
+		if(applicablePromotions == null || applicablePromotions.size() == 0) {
+			return null;
+		}
 		
 		List<PEOrderPromotion> peOrderPromotions = new ArrayList<>();
 		for(PEPromotion promo : applicablePromotions) {
@@ -81,13 +90,18 @@ public class PromotionEngineServiceImpl implements PromotionEngineService {
 		return bestOffer;
 	}
 	
+	@Override
+	public List<PEOrderPromotion> getAppliedPromotionsForOrder(String orderId) {
+		return peOrderPromotionService.getAppliedPromotionsByOrder(orderId);
+	}
+	
 	@PostConstruct
 	public void init() {
 		
 		OFFERS_MAP.put(PromotionConstants.CASH_BACK, cashBackOffer);
 		OFFERS_MAP.put(PromotionConstants.DISCOUNT, discountOffer);
 		OFFERS_MAP.put(PromotionConstants.BUY_GET, buyGetOffer);
-		OFFERS_MAP.put(PromotionConstants.BUY_GET, highPriceOffer);
+		OFFERS_MAP.put(PromotionConstants.HIGH_PRICE, highPriceOffer);
 		
 		
 		OrderDTO o1 = new OrderDTO();
@@ -123,6 +137,10 @@ public class PromotionEngineServiceImpl implements PromotionEngineService {
 		
 		ORDER_MAP.put("o1_4a", o1);
 		ORDER_MAP.put("o2_4a", o2);
+	}
+
+	public Map<String, OrderDTO> getORDER_MAP() {
+		return ORDER_MAP;
 	}
 
 }

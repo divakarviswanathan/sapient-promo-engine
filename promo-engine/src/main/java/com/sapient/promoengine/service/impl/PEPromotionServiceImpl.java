@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.sapient.promoengine.commons.PromotionConstants;
 import com.sapient.promoengine.entity.PEPromotion;
@@ -23,7 +24,9 @@ public class PEPromotionServiceImpl implements PEPromotionService {
 	
 	@Override
 	public List<PEPromotion> getApplicablePromotionsForOrder(OrderDTO order) {
-		
+		if(order == null || StringUtils.isEmpty(order.getOrderId())) {
+			return null;
+		}
 		Criteria criteria = new Criteria();
         Criteria orderValue = Criteria.where(PromotionConstants.PROMO_RULES+"."+PromotionConstants.MIN_TOTAL_VALUE).lte(order.getTotalValue());
         Criteria paymentMode = Criteria.where(PromotionConstants.PROMO_RULES+"."+PromotionConstants.PAYMENT_MODE).is(order.getPaymentMode());

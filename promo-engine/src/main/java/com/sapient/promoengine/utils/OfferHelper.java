@@ -27,6 +27,9 @@ public class OfferHelper {
 	private ObjectConverterUtil objectConverterUtil; 
 	
 	public PEOrderPromotion applyOfferAtOrderLevel(OrderDTO order, PEPromotion pePromo, String desciptionString) {
+		if(order == null || pePromo == null) {
+			return null;
+		}
 		Map<String, Serializable> actualValueMap = objectConverterUtil.getOrderValueMap(order);
 		
 		double value = 0d;
@@ -39,7 +42,6 @@ public class OfferHelper {
 				value += offerValue;
 			}
 		}
-		
 		return constructOrderPromotion(value, order.getOrderId(), pePromo.getPromoCode(), pePromo.getPromoType(), desciptionString);
 	}
 	
